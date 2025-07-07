@@ -14,7 +14,12 @@ A simple web-based toolkit to convert ClearKey DRM keys between JSON (Base64 URL
 
 ## File Structure
 
-/your-folder/ ├── index.html           # Landing page with navigation ├── json-to-hex.html     # JSON to Hex converter ├── hex-to-json.html     # Hex to JSON converter └── README.md            # This file
+/your-folder/
+├── index.html                 # Landing page with navigation links to the converters
+├── convert/
+│   ├── json-to-hex.html       # Tool to convert Json To Hex
+│   └── hex-to-json.html       # Tool to convert Hex to JSON
+└── README.md                  # Project Documentation
 
 ---
 
