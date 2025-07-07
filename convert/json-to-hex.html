@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ClearKey JSON to Hex Converter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f6f8fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      max-width: 800px;
+    }
+    textarea {
+      font-family: monospace;
+    }
+    pre {
+      background-color: #f0f0f0;
+      padding: 1rem;
+      border-radius: 5px;
+      border: 1px solid #d0d0d0;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <h2 class="mb-4 text-center">🔐 ClearKey JSON → Hex Converter</h2>
+
+    <div class="mb-3">
+      <label for="jsonInput" class="form-label"><strong>Paste your ClearKey JSON here:</strong></label>
+      <textarea id="jsonInput" class="form-control" rows="10" placeholder='{"keys":[{"kid":"...","k":"..."}],"type":"temporary"}'></textarea>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button class="btn btn-primary" onclick="convertClearKey()">Convert to Hex</button>
+    </div>
+
+    <div class="mt-4">
+      <label class="form-label"><strong>Output (Hex format — kid:key)</strong></label>
+      <pre id="output" class="border"></pre>
+    </div>
+
+    <footer class="text-muted mt-5 text-center">
+      <small>Built with ❤️ for ClearKey developers. Compatible with ExoPlayer, Shaka, and OTT Navigator.</small>
+    </footer>
+  </div>
+
+  <script>
+    function base64urlToBytes(b64url) {
+      b64url = b64url.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64url.length % 4) b64url += '=';
+      return Uint8Array.from(atob(b64url), c => c.charCodeAt(0));
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function convertClearKey() {
+      const input = document.getElementById("jsonInput").value;
+      const output = document.getElementById("output");
+      output.textContent = "";
+
+      try {
+        const data = JSON.parse(input.trim());
+        const keys = data.keys || [];
+
+        if (!keys.length) {
+          output.textContent = "⚠️ No keys found in JSON.";
+          return;
+        }
+
+        const hexPairs = keys.map(key => {
+          const kidHex = bytesToHex(base64urlToBytes(key.kid));
+          const kHex = bytesToHex(base64urlToBytes(key.k));
+          return `${kidHex}:${kHex}`;
+        });
+
+        output.textContent = hexPairs.join("\n");
+      } catch (err) {
+        output.textContent = "❌ Invalid JSON or ClearKey format.";
+      }
+    }
+  </script>
+</body>
+</html>
